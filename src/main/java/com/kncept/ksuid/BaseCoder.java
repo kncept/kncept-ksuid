@@ -48,8 +48,9 @@ public class BaseCoder {
         for(int i = 0; i < indicies.length; i++)
             accumulator.append(alphabet.charAt(indicies[i]));
 
-        if (accumulator.isEmpty()) accumulator.append("0");
-        return accumulator.toString();
+        String encoded = accumulator.toString();
+        if (encoded.isEmpty()) return "0";
+        return encoded;
     }
 
     protected byte[] convertBase(byte[] fromNumber, int fromBase, int toBase) {
@@ -179,6 +180,7 @@ public class BaseCoder {
 
         @Override
         public byte[] decode(String input) {
+            if (input == null || input.isEmpty()) return super.decode(input);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             for (int i = 0; i < input.length(); i += decodeGroupSize) {
