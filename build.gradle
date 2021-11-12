@@ -3,7 +3,8 @@ import java.time.LocalDate
 
 plugins {
     id 'com.kncept.junit.reporter' version '2.0.1'
-//	id "com.github.spotbugs" version '4.6.0'
+	id "com.github.spotbugs" version '4.6.0'
+	id 'maven-publish'
 }
 
 apply plugin: 'java'
@@ -140,14 +141,6 @@ wrapper {
 }
 
 dependencies {
-
-	// fix for:
-//	warning: unknown enum constant When.MAYBE
-//	reason: class file for javax.annotation.meta.When not found
-	// https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305
-//	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-//	implementation 'com.techshroom:jsr305-plus:0.0.1' // MIT licence
-
 	testImplementation "org.junit.jupiter:junit-jupiter-api:" + junit5version
 	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:" + junit5version
 }
@@ -161,7 +154,6 @@ sourceSets {
 	}
 }
 
-// TODO = embed this into the manifest properly
 task captureCurrentGitHash {
 	doLast {
 		def resourcesFolder = "$projectDir/src/generated/resources/com/kncept/ksuid"
@@ -172,3 +164,69 @@ task captureCurrentGitHash {
 	}
 }
 compileJava.dependsOn captureCurrentGitHash
+
+
+
+String publishUsername = project.hasProperty('ossrhUsername') ? ossrhUsername : System.getenv("MAVEN_USERNAME")
+String publishPassword = project.hasProperty('ossrhPassword') ? ossrhPassword : System.getenv("MAVEN_PASSWORD")
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			pom {
+				name = 'Kncept Ksuid'
+				description = 'Time Series URL safe high entropy ID. Compatable with segmentio Ksuid'
+				url = 'https://github.com/kncept/kncept-ksuid'
+				properties = [
+						"corporate.website": "http://kncept.com",
+				]
+				licenses {
+					license {
+						name = 'MIT License'
+						url = 'https://github.com/kncept/kncept-ksuid/blob/main/LICENSE'
+					}
+				}
+				developers {
+					developer {
+						id = 'nkrul'
+						name = 'Nicholas Krul'
+						email = 'nicholas.krul@gmail.com'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/kncept/kncept-ksuid.git'
+					developerConnection = 'scm:git:ssh://github.com/kncept/kncept-ksuid.git'
+					url = 'https://github.com/kncept/kncept-ksuid'
+				}
+			}
+		}
+	}
+	repositories {
+//		https://docs.github.com/en/free-pro-team@latest/actions/guides/publishing-java-packages-with-gradle
+		maven {
+			name = "OSSRH"
+			url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+			credentials {
+				username = publishUsername
+				password = publishPassword
+			}
+		}
+	}
+}
+
+signing {
+	sign publishing.publications.mavenJava
+}
+tasks.withType(Sign) {
+	onlyIf {
+//		isReleaseVersion
+		new File('gradle.properties').exists() // only sign locally at the moment
+	}
+}
+
+javadoc {
+	if(JavaVersion.current().isJava9Compatible()) {
+		options.addBooleanOption('html5', true)
+	}
+}

@@ -29,6 +29,6 @@ jobs:
     - name: Expose built artifact
       uses: actions/upload-artifact@v2
       with:
-        name: my-artifact
+#        name: kncept-ksuid.jar
         path: build/libs/
         retention-days: 7

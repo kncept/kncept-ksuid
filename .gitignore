@@ -3,3 +3,6 @@
 .idea/
 build/
 src/generated/
+
+gradle.properties
+secring.gpg
