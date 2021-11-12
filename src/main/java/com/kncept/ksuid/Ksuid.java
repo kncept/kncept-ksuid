@@ -1,5 +1,8 @@
 package com.kncept.ksuid;
 
+import com.kncept.ksuid.utils.BaseCoder;
+import com.kncept.ksuid.utils.ByteConverter;
+
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -40,9 +43,9 @@ public class Ksuid {
         if (value == null || value.equals("")) {
             this.data = generateInitialData();
         } else if (value.length() == base62Length) {
-            this.data = unpackMinimalArray(ByteConverter.decodeBase62(value));
+            this.data = unpackMinimalArray(BaseCoder.base62Encoder.decode(value));
         } else if (value.length() == base16Length) {
-            this.data = unpackMinimalArray(ByteConverter.decodeBase16(value));
+            this.data = unpackMinimalArray(BaseCoder.base16Encoder.decode(value));
         } else {
             throw new IllegalArgumentException("Unable to construct a Ksuid from " + value);
         }
@@ -69,20 +72,12 @@ public class Ksuid {
     }
 
     public String toBase16() {
-//        return ByteConverter.encodeBase16(data);
-        return padPrefixToLength("0", ByteConverter.encodeBase16(data).toUpperCase(), base16Length);
-
+        return padPrefixToLength("0", BaseCoder.base16Encoder.encode(data), base16Length);
     }
 
     public String toBase62() {
-//        return ByteConverter.encodeBase62(data);
-        return padPrefixToLength("0", ByteConverter.encodeBase62(data), base62Length);
+        return padPrefixToLength("0", BaseCoder.base62Encoder.encode(data), base62Length);
     }
-
-    public String toBase64() {
-        return ByteConverter.encodeBase64(data);
-    }
-
 
     public int getRawKsuidEpoch() {
         return ByteConverter.decodeInt(data);
@@ -122,5 +117,9 @@ public class Ksuid {
             value = prefix + value;
         }
         return value;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new Ksuid());
     }
 }

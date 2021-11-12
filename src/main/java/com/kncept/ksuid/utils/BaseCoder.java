@@ -1,4 +1,4 @@
-package com.kncept.ksuid;
+package com.kncept.ksuid.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
@@ -16,7 +16,7 @@ public class BaseCoder {
     public static final String alphabet_base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 // !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_ // uuencoding
 
-//    public static final BaseCoder base16Encoder = new BaseCoder(alphabet_base16);
+    public static final BaseCoder base16Encoder = new BaseCoder(alphabet_base16);
     public static final BaseCoder base62Encoder = new BaseCoder(alphabet_base62);
     public static final BaseCoder base64Encoder = new ByteGroupingBaseCoder(3, 4, alphabet_base64, "");
     public static final BaseCoder base64EncoderWithPadding = new ByteGroupingBaseCoder(3, 4, alphabet_base64, "=");
@@ -159,7 +159,7 @@ public class BaseCoder {
                 String encoding = super.encode(group);
 
                 if (i + encodeGroupSize > input.length) { // if not an exact block encoding match
-                    for(int j = input.length & group.length; j < group.length; j++) {
+                    for(int j = input.length % group.length; j < group.length; j++) {
                         group[j] = 1; // just the least sigificant bit. so that it doesn't change any partially encoded values
                     }
                     String byteZeroPaddedEncoding = encoding;

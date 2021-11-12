@@ -1,9 +1,9 @@
-package com.kncept.ksuid;
+package com.kncept.ksuid.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.kncept.ksuid.BaseCoder.alphabet_base16;
+import static com.kncept.ksuid.utils.BaseCoder.alphabet_base16;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,7 +23,7 @@ public class BaseCoderTest {
 
     @Test
     public void base16ZeroHandling() {
-        assertZeroHandling(new BaseCoder(alphabet_base16));
+        assertZeroHandling(BaseCoder.base16Encoder);
     }
 
     private void assertZeroHandling(BaseCoder baseCoder) {
@@ -40,7 +40,7 @@ public class BaseCoderTest {
 
     @Test
     public void base16EmptyHandling() {
-        assertEmptyHandling(new BaseCoder(alphabet_base16));
+        assertEmptyHandling(BaseCoder.base16Encoder);
     }
 
     private void assertEmptyHandling(BaseCoder baseCoder) {
@@ -133,6 +133,53 @@ public class BaseCoderTest {
         assertArrayEquals(
                 "Many hands make light work.".getBytes(),
                 baseCoder.decode("TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu")
+        );
+
+        baseCoder = BaseCoder.base64EncoderWithPadding;
+        assertEquals(
+                "aHR0cHM6Ly93d3cuYmV0dGVyLWNvbnZlcnRlci5jb20vQmFzZTY0LUVuY29kZQ==",
+                baseCoder.encode("https://www.better-converter.com/Base64-Encode".getBytes())
+        );
+        assertArrayEquals(
+                "https://www.better-converter.com/Base64-Encode".getBytes(),
+                baseCoder.decode("aHR0cHM6Ly93d3cuYmV0dGVyLWNvbnZlcnRlci5jb20vQmFzZTY0LUVuY29kZQ==")
+        );
+    }
+
+    @Test
+    public void base62Compatibility() {
+        BaseCoder baseCoder = BaseCoder.base62Encoder;
+
+        // https://github.com/seruco/base62
+        assertEquals("73XpUgyMwkGr29M", baseCoder.encode("Hello World".getBytes()));
+        assertEquals("Hello World", new String(baseCoder.decode("73XpUgyMwkGr29M")));
+
+        assertEquals("UMNTpGxZW0IadmWS", baseCoder.encode("Kncept Ksuid".getBytes()));
+        assertEquals("Kncept Ksuid", new String(baseCoder.decode("UMNTpGxZW0IadmWS")));
+        assertEquals(
+                "OFdrUKABqhgqpDiiXQjFqvi8BIv5DEPYoIzgRilzpmpD9X3quWRhcT51jHhcvcrFG1GohGXDM32Q1lwvhxQcGj",
+                baseCoder.encode("https://www.better-converter.com/Encoders-Decoders/Base62-Encode".getBytes())
+        );
+        assertEquals(
+                "https://www.better-converter.com/Encoders-Decoders/Base62-Encode",
+                new String(baseCoder.decode("OFdrUKABqhgqpDiiXQjFqvi8BIv5DEPYoIzgRilzpmpD9X3quWRhcT51jHhcvcrFG1GohGXDM32Q1lwvhxQcGj"))
+        );
+    }
+
+    @Test
+    public void base16Compatability() {
+        BaseCoder baseCoder = BaseCoder.base16Encoder;
+
+        assertEquals("48656c6c6f20576f726c64".toUpperCase(), baseCoder.encode("Hello World".getBytes()));
+        assertEquals("Hello World", new String(baseCoder.decode("48656c6c6f20576f726c64".toUpperCase())));
+
+        assertEquals(
+                "68747470733a2f2f7777772e6265747465722d636f6e7665727465722e636f6d2f456e636f646572732d4465636f646572732f41736369692d546f2d4865782d456e636f646572".toUpperCase(),
+                baseCoder.encode("https://www.better-converter.com/Encoders-Decoders/Ascii-To-Hex-Encoder".getBytes())
+        );
+        assertEquals(
+                "https://www.better-converter.com/Encoders-Decoders/Ascii-To-Hex-Encoder",
+                new String(baseCoder.decode("68747470733a2f2f7777772e6265747465722d636f6e7665727465722e636f6d2f456e636f646572732d4465636f646572732f41736369692d546f2d4865782d456e636f646572".toUpperCase()))
         );
     }
 

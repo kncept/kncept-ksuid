@@ -1,4 +1,4 @@
-package com.kncept.ksuid;
+package com.kncept.ksuid.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

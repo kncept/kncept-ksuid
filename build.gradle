@@ -1,3 +1,5 @@
+import java.time.Clock
+import java.time.LocalDate
 
 plugins {
     id 'com.kncept.junit.reporter' version '2.0.1'
@@ -9,7 +11,7 @@ apply plugin: 'java'
 //apply plugin: 'pmd'
 
 group = 'com.kncept'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 sourceCompatibility = 14
 targetCompatibility = 14
 
@@ -38,6 +40,34 @@ def getCheckedOutGitCommitHash() {
 	if(isCommit) return head[0].trim()
 	def refHead = new File(gitFolder + head[1].trim()) // .git/refs/heads/master
 	refHead.text.trim()
+}
+
+// yyyy-mm-dd, because some countrys DON'T use dd/mm/yy as their date format.
+def todaysDate() {
+	def date = LocalDate.now(Clock.systemUTC())
+	return "${date.getDayOfYear()}-${date.getMonth()}-${date.getDayOfMonth()}"
+}
+
+jar {
+	manifest { // https://docs.oracle.com/javase/tutorial/deployment/jar/manifestindex.html
+		attributes(
+				"Main-Class": "com.kncept.ksuid.Ksuid",
+
+				"Created-By": "Gradle ${gradle.gradleVersion}",
+				"Build-Jdk": "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+				"Build-OS": "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}",
+				"Build-Date": todaysDate(),
+				"Build-Hash": getCheckedOutGitCommitHash(),
+
+				"Name": "com/kncept/",
+				"Specification-Title": "Ksuid",
+				"Specification-Version": "1.0.0",
+				"Specification-Vendor": "Kncept",
+				"Implementation-Title": "Kncept-Ksuid",
+				"Implementation-Version": archiveVersion,
+				"Implementation-Vendor": "Kncept",
+		)
+	}
 }
 
 /*

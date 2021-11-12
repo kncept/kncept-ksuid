@@ -1,14 +1,18 @@
 package com.kncept.ksuid;
 
 
-import org.junit.jupiter.api.Assertions;
+import com.kncept.ksuid.utils.BaseCoder;
+import com.kncept.ksuid.utils.ByteConverter;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 import static com.kncept.ksuid.Ksuid.EPOCH_SECONDS;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class KsuidTest {
 
@@ -61,7 +65,7 @@ public class KsuidTest {
     // https://github.com/segmentio/ksuid#inspect-the-components-of-a-ksuid
     @Test
     public void assertCompatabilityWithExample1() {
-        assertSegementioCompatability(
+        assertKsuidFields(
                 "0ujtsYcgvSTl8PAuAdqWYSMnLOv",
                 "0669F7EFB5A1CD34B5F99D1154FB6853345C9735",
                 107608047,
@@ -72,7 +76,7 @@ public class KsuidTest {
     // https://github.com/segmentio/ksuid#generate-a-ksuid-and-inspect-its-components
     @Test
     public void assertCompatabilityWithExample2() {
-        assertSegementioCompatability(
+        assertKsuidFields(
                 "0ujzPyRiIAffKhBux4PvQdDqMHY",
                 "066A029C73FC1AA3B2446246D6E89FCD909E8FE8",
                 107610780,
@@ -83,25 +87,25 @@ public class KsuidTest {
     // https://github.com/segmentio/ksuid#generate-ksuids-and-output-json-using-template-formatting
     @Test
     public void assertCompatibilityWithExample3() {
-        assertSegementioCompatability(
+        assertKsuidFields(
                 "0uk1Hbc9dQ9pxyTqJ93IUrfhdGq",
                 null,
                 107611700,
                 "9850EEEC191BF4FF26F99315CE43B0C8"
         );
-        assertSegementioCompatability(
+        assertKsuidFields(
                 "0uk1HdCJ6hUZKDgcxhpJwUl5ZEI",
                 null,
                 107611700,
                 "CC55072555316F45B8CA2D2979D3ED0A"
         );
-        assertSegementioCompatability(
+        assertKsuidFields(
                 "0uk1HcdvF0p8C20KtTfdRSB9XIm",
                 null,
                 107611700,
                 "BA1C205D6177F0992D15EE606AE32238"
         );
-        assertSegementioCompatability(
+        assertKsuidFields(
                 "0uk1Ha7hGJ1Q9Xbnkt0yZgNwg3g",
                 null,
                 107611700,
@@ -127,12 +131,12 @@ public class KsuidTest {
 
         System.out.println(" " + ts1 + " " + ksuid.getRawKsuidEpoch() + " " + ts2);
 
-        Assertions.assertTrue(ksuid.getRawKsuidEpoch() >= ts1);
-        Assertions.assertTrue(ksuid.getRawKsuidEpoch() <= ts2);
+        assertTrue(ksuid.getRawKsuidEpoch() >= ts1);
+        assertTrue(ksuid.getRawKsuidEpoch() <= ts2);
 
     }
 
-    public void assertSegementioCompatability(
+    public void assertKsuidFields(
             String base62Value,
             String base16Value,
             int rawTimestamp,
@@ -144,9 +148,19 @@ public class KsuidTest {
         assertEquals(base62Value, ksuid.toBase62());
         assertEquals(rawTimestamp, ksuid.getRawKsuidEpoch());
         if (base16Value != null) assertEquals(base16Value, ksuid.toBase16());
-        byte[] expectedEntropy = ByteConverter.decodeBase16(base16Entropy);
+        byte[] expectedEntropy = BaseCoder.base16Encoder.decode(base16Entropy);
         assertEquals(Ksuid.entropyLength, expectedEntropy.length);
         assertArrayEquals(expectedEntropy, ksuid.getEntropy());
     }
 
+    @Test
+    public void timeConverterIsAccurate() {
+        // have to trim this to the second
+        LocalDateTime utcTime = LocalDateTime.now(Clock.systemUTC()).truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime ksuidTime = new Ksuid().getTime();
+        assertTrue(utcTime.isBefore(ksuidTime) || utcTime.isEqual(ksuidTime));
+        LocalDateTime endUtcTime = utcTime.plusSeconds(10); // MUST be quicker than this.
+        assertTrue(endUtcTime.isAfter(ksuidTime));
+
+    }
 }
