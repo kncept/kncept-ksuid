@@ -20,8 +20,8 @@ apply plugin: 'java'
 //apply plugin: 'checkstyle'
 //apply plugin: 'pmd'
 
-group = 'com.kncept'
-version = '1.0.0'
+group = 'com.kncept.ksuid'
+version = '1.0.1-SNAPSHOT'
 sourceCompatibility = 14
 targetCompatibility = 14
 
