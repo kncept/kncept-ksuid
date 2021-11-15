@@ -10,18 +10,32 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 
+/**
+ * The Main Ksuid class/<br>
+ *
+ * Create new instances for 'now' timestamps, or pass in a <pre>ZonedDateTime</pre> for a specific point in time.<br>
+ * Don't use the (int, byte[]) constructor unless you know what you are doing.<br/>
+ */
 public class Ksuid {
+    /** Ksuid Epoc is adjusted. Approx. date is 13th May, 2014 */
     public static final int EPOCH_SECONDS = 1400000000;
     private final byte[] data;
 
+    /** The smallest possible Ksuid = 20 bytes of 0x00 */
     public static final Ksuid MINIMUM_KSUID = new Ksuid("000000000000000000000000000");
+    /** The largest possible Ksuid = 20 bytes of 0xFF */
     public static final Ksuid MAXIMUM_KSUID = new Ksuid("aWgEPTl1tmebfsQzFP4bxwgy80V");
 
     private static SecureRandom random = new SecureRandom();
+    /** Bytes Length of the timestamp */
     protected static final int tsLength = 4;
+    /** Bytes Length of the entropy */
     protected static final int entropyLength = 16;
+    /** Bytes Length of the ksuid */
     protected static final int totalLength = 20;
+    /** Encoded Length in base62 */
     protected static final int base62Length = 27;
+    /** Encoded Length in base16 */
     protected static final int base16Length = 40;
 
     public Ksuid() {

@@ -1,6 +1,14 @@
 import java.time.Clock
 import java.time.LocalDate
 
+// to publish:
+// update project version to the appropriate release
+// populate gradle.properties
+// gradlew publish
+// approve at https://oss.sonatype.org
+// goto 'Staging Repositories'
+// 'close', then 'release' the library
+
 plugins {
     id 'com.kncept.junit.reporter' version '2.0.1'
 	id "com.github.spotbugs" version '4.6.0'
@@ -13,13 +21,13 @@ apply plugin: 'java'
 //apply plugin: 'pmd'
 
 group = 'com.kncept'
-version = '0.0.2-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = 14
 targetCompatibility = 14
 
 defaultTasks 'build', 'check'
 
-def junit5version = '5.5.1'
+def junit5version = '5.8.1'
 
 test.finalizedBy 'junitHtmlReport'
 junitHtmlReport {
@@ -30,9 +38,7 @@ repositories {
 //	mavenLocal() // ./m2/repositories
 //	maven { url 'https://repo.spring.io/libs-release'}
 	mavenCentral()
-	jcenter()
 }
-
 
 // eg: https://gist.github.com/MRezaNasirloo/ccfdb24f10ebefee0d871d4e84b37309
 def getCheckedOutGitCommitHash() {
@@ -169,10 +175,12 @@ task captureCurrentGitHash {
 compileJava.dependsOn captureCurrentGitHash
 
 
-
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
 String publishUsername = project.hasProperty('ossrhUsername') ? ossrhUsername : System.getenv("MAVEN_USERNAME")
 String publishPassword = project.hasProperty('ossrhPassword') ? ossrhPassword : System.getenv("MAVEN_PASSWORD")
-
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
@@ -217,7 +225,6 @@ publishing {
 		}
 	}
 }
-
 signing {
 	sign publishing.publications.mavenJava
 }
@@ -227,7 +234,6 @@ tasks.withType(Sign) {
 		new File('gradle.properties').exists() // only sign locally at the moment
 	}
 }
-
 javadoc {
 	if(JavaVersion.current().isJava9Compatible()) {
 		options.addBooleanOption('html5', true)

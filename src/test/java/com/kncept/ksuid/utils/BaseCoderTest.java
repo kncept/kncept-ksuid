@@ -3,9 +3,11 @@ package com.kncept.ksuid.utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 
 import static com.kncept.ksuid.utils.BaseCoder.alphabet_base16;
+import static com.kncept.ksuid.utils.BaseCoder.numberOfDigits;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -78,6 +80,12 @@ public class BaseCoderTest {
 
         // just to prove leading zeros do nothing ;)
         assertArrayEquals(new byte[]{6, 4}, baseCoder.convertBase(new byte[]{0, 0, 1,0, 0}, 10, 16));
+
+
+        assertArrayEquals(new byte[]{2, 5, 6}, baseCoder.convertBase(new byte[]{1, 0}, 256, 10));
+        assertArrayEquals(new byte[]{2, 5, 5}, baseCoder.convertBase(new byte[]{-1}, 256, 10));
+        assertArrayEquals(new byte[]{6, 5, 5, 3, 5}, baseCoder.convertBase(new byte[]{-1, -1}, 256, 10));
+        assertArrayEquals(new byte[]{6, 5, 5, 3, 6}, baseCoder.convertBase(new byte[]{1, 0, 0}, 256, 10));
     }
 
     @Test
@@ -186,4 +194,21 @@ public class BaseCoderTest {
         );
     }
 
+    @Test
+    public void assertNumberOfDigits() {
+        // N.B. BigInteger uses base 10
+        assertEquals(3, numberOfDigits(new BigInteger("100"), new BigInteger("10")));
+        assertEquals(2, numberOfDigits(new BigInteger("10"), new BigInteger("10")));
+        assertEquals(1, numberOfDigits(new BigInteger("1"), new BigInteger("10")));
+        assertEquals(0, numberOfDigits(new BigInteger("0"), new BigInteger("10")));
+
+        assertEquals(0, numberOfDigits(new BigInteger("0"), new BigInteger("2")));
+        assertEquals(1, numberOfDigits(new BigInteger("1"), new BigInteger("2")));
+        assertEquals(2, numberOfDigits(new BigInteger("2"), new BigInteger("2")));
+        assertEquals(2, numberOfDigits(new BigInteger("3"), new BigInteger("2")));
+        assertEquals(3, numberOfDigits(new BigInteger("4"), new BigInteger("2")));
+        assertEquals(3, numberOfDigits(new BigInteger("5"), new BigInteger("2")));
+        assertEquals(3, numberOfDigits(new BigInteger("7"), new BigInteger("2")));
+        assertEquals(4, numberOfDigits(new BigInteger("8"), new BigInteger("2")));
+    }
 }

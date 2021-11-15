@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 
 /**
- * This is intended to be a 'drop in' class to take and customise if required.
- * This includes moving the package.
+ * This is intended to be a 'drop in' class to take and customise if required.<br/>
+ * This includes changeing the package to your own 'utils' class<br/>
  * If you do that, please leave this header, and credit nicholas.krul@gmail.com
- * Better yet - raise a PR
+ * If you have improvements, raise a PR.
  */
 public class BaseCoder {
     public static final String alphabet_base16 = "0123456789ABCDEF";
@@ -39,7 +39,6 @@ public class BaseCoder {
         return decoded;
     }
 
-    // TODO: something like this -  https://codegolf.stackexchange.com/questions/1620/arbitrary-base-conversion/21672#21672
     public String encode (byte[] input) {
         if (input == null || input.length == 0) return "";
         byte[] indicies = convertBase(input, 256, alphabet.length());
@@ -53,12 +52,23 @@ public class BaseCoder {
         return encoded;
     }
 
-    protected byte[] convertBase(byte[] fromNumber, int fromBase, int toBase) {
-        return fullyReadAndConvert(fromNumber, fromBase, toBase);
+    /**
+     * Calculates the number of digits in a number for a given base
+     * @param number the number we are testing
+     * @param base the base we want to know the number of digits in
+     * @return the number of digits the number has
+     */
+    public static int numberOfDigits(BigInteger number, BigInteger base) {
+        int counter = 0;
+        while (number.compareTo(BigInteger.ZERO) > 0) {
+            number = number.divide(base);
+            counter++;
+        }
+        return counter;
     }
 
     // not efficient. Use maths and fully read into memory
-    protected byte[] fullyReadAndConvert(byte[] fromNumber, int fromBase, int toBase) {
+    protected byte[] convertBase(byte[] fromNumber, int fromBase, int toBase) {
         if (fromBase == toBase) throw new IllegalArgumentException();
         if (fromBase < 0 || toBase < 0) throw new IllegalArgumentException();
         if (fromNumber == null || fromNumber.length == 0) throw new IllegalArgumentException();
@@ -69,8 +79,7 @@ public class BaseCoder {
         BigInteger number  = BigInteger.ZERO;
         for(byte in: fromNumber) {
             int digit = in & 0xFF; //Byte.toUnsignedInt(in);
-            if (digit >= fromBase
-            ) throw new IllegalArgumentException("digit was " + digit + " in base " + fromBase); //invalid base!
+            if (digit >= fromBase) throw new IllegalArgumentException("digit was " + digit + " in base " + fromBase); //invalid base!
             number = number.multiply(fromBaseBigint);
             number = number.add(new BigInteger(Integer.toString(digit)));
         }
@@ -117,6 +126,10 @@ public class BaseCoder {
 //        return baos.toByteArray();
     }
 
+    /**
+     * reverses the passed in array
+     * @param array value to reverse
+     */
     // https://stackoverflow.com/questions/12893758/how-to-reverse-the-byte-array-in-java#12893827
     public static void reverse(byte[] array) {
         if (array == null) {

@@ -1,7 +1,17 @@
 package com.kncept.ksuid.utils;
 
+/**
+ * A small set of byte based utilities required for ksuids
+ */
 public class ByteConverter {
 
+    /** left pads an array if required.
+     *
+     * @param padWith the value to pad the array with - typically 0x00 or 0xFF
+     * @param data the source array
+     * @param length the desired array
+     * @return an array of length (or more), padded to the left is nessesary
+     */
     public static byte[] padArray(byte padWith, byte[] data, int length) {
         if (data.length < length) {
             byte[] padded = new byte[length];
@@ -14,6 +24,11 @@ public class ByteConverter {
         return data;
     }
 
+    /** Encodes an integer into a 4 byte array
+     *
+     * @param value int to encode
+     * @return byte array encoding the int
+     */
     public static byte[] encodeInt(int value) {
         byte[] result = new byte[4];
         result[0] = (byte) ((value >> 24) & 0xFF);
@@ -27,6 +42,12 @@ public class ByteConverter {
         return result;
     }
 
+    /** byte maths - reads an int from the first 4 bytes of the array. <br>
+     * will zero pad the beginning if a short array is passed in
+     *
+     * @param value byte array to decode
+     * @return int value
+     */
     public static int decodeInt(byte[] value) {
         value = padArray((byte)0, value, 4);
         return
@@ -36,6 +57,12 @@ public class ByteConverter {
                 (value[3] & 0xFF);
     }
 
+    /** Joins two arrays together
+     *
+     * @param prefix start of new array
+     * @param suffix end of new array
+     * @return prefix + suffix
+     */
     public static byte[] join(byte[] prefix, byte[] suffix) {
         byte[] result = new byte[prefix.length + suffix.length];
         System.arraycopy(prefix, 0, result, 0, prefix.length);

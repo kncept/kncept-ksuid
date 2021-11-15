@@ -29,8 +29,10 @@ jobs:
     - name: Expose test reports
       uses: actions/upload-artifact@v2
       with:
-        name: spotbugs-results
-        path: build/reports/[spotbugs|junitreporter]/*
+        name: quality-results
+        path: |
+          build/reports/spotbugs/*
+          build/reports/junitreporter/*
         retention-days: 7
     - name: Expose built artifact
       uses: actions/upload-artifact@v2
