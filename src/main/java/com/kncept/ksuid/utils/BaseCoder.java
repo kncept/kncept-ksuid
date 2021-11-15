@@ -69,7 +69,8 @@ public class BaseCoder {
         BigInteger number  = BigInteger.ZERO;
         for(byte in: fromNumber) {
             int digit = in & 0xFF; //Byte.toUnsignedInt(in);
-            if (digit >= fromBase || digit < 0) throw new IllegalArgumentException("digit was " + digit + " in base " + fromBase); //invalid base!
+            if (digit >= fromBase
+            ) throw new IllegalArgumentException("digit was " + digit + " in base " + fromBase); //invalid base!
             number = number.multiply(fromBaseBigint);
             number = number.add(new BigInteger(Integer.toString(digit)));
         }

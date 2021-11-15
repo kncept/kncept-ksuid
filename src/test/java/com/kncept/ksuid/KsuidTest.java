@@ -157,7 +157,7 @@ public class KsuidTest {
     public void timeConverterIsAccurate() {
         // have to trim this to the second
         LocalDateTime utcTime = LocalDateTime.now(Clock.systemUTC()).truncatedTo(ChronoUnit.SECONDS);
-        LocalDateTime ksuidTime = new Ksuid().getTime();
+        LocalDateTime ksuidTime = new Ksuid().getTime().toLocalDateTime();
         assertTrue(utcTime.isBefore(ksuidTime) || utcTime.isEqual(ksuidTime));
         LocalDateTime endUtcTime = utcTime.plusSeconds(10); // MUST be quicker than this.
         assertTrue(endUtcTime.isAfter(ksuidTime));

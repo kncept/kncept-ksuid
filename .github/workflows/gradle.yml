@@ -25,10 +25,16 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build and Test with Gradle
-      run: ./gradlew check jar
+      run: ./gradlew clean check jar
+    - name: Expose test reports
+      uses: actions/upload-artifact@v2
+      with:
+        name: spotbugs-results
+        path: build/reports/[spotbugs|junitreporter]/*
+        retention-days: 7
     - name: Expose built artifact
       uses: actions/upload-artifact@v2
       with:
-#        name: kncept-ksuid.jar
+        #        name: kncept-ksuid.jar
         path: build/libs/
         retention-days: 7

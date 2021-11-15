@@ -4,9 +4,10 @@ import com.kncept.ksuid.utils.BaseCoder;
 import com.kncept.ksuid.utils.ByteConverter;
 
 import java.security.SecureRandom;
+import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 public class Ksuid {
@@ -24,31 +25,39 @@ public class Ksuid {
     protected static final int base16Length = 40;
 
     public Ksuid() {
-        this((String)null);
+        data = generateInitialData();
     }
     public Ksuid(int rawKsuidEpoch, byte[] entropy) {
-        if (entropy == null || entropy.length != entropyLength) throw new IllegalArgumentException("Incorrect Entropy");
-        this.data = toArray(rawKsuidEpoch, entropy);
+        if (entropy == null) entropy = generateEntropy();
+        if (entropy.length != entropyLength) throw new IllegalArgumentException("Incorrect Entropy");
+        data = join(rawKsuidEpoch, entropy);
     }
     public Ksuid(byte[] value) {
         if (value == null) {
-            this.data = generateInitialData();
+            data = generateInitialData();
         } else if (value.length == totalLength) {
-            this.data = value;
+            data = new byte[totalLength];
+            System.arraycopy(value, 0, data, 0, totalLength);
         } else {
             throw new IllegalArgumentException("Unable to construct a Ksuid");
         }
     }
     public Ksuid(String value) {
         if (value == null || value.equals("")) {
-            this.data = generateInitialData();
+            data = generateInitialData();
         } else if (value.length() == base62Length) {
-            this.data = unpackMinimalArray(BaseCoder.base62Encoder.decode(value));
+            data = unpackMinimalArray(BaseCoder.base62Encoder.decode(value));
         } else if (value.length() == base16Length) {
-            this.data = unpackMinimalArray(BaseCoder.base16Encoder.decode(value));
+            data = unpackMinimalArray(BaseCoder.base16Encoder.decode(value));
         } else {
             throw new IllegalArgumentException("Unable to construct a Ksuid from " + value);
         }
+    }
+    public Ksuid(ZonedDateTime when, byte[] entropy) {
+        int ts = (int)when.toInstant().getEpochSecond();
+        if (entropy == null) entropy = generateEntropy();
+        if (entropy.length != entropyLength) throw new IllegalArgumentException("Incorrect Entropy");
+        data = join(ts, entropy);
     }
 
     private byte[] unpackMinimalArray(byte[] data) {
@@ -59,15 +68,17 @@ public class Ksuid {
     }
 
     private byte[] generateInitialData() {
-        // UTC based timestamp
-        int ts = (int)(Instant.now().toEpochMilli() / 1000);
-        ts -= EPOCH_SECONDS;
-        byte[] entropy = new byte[entropyLength];
-        random.nextBytes(entropy);
-        return toArray(ts, entropy);
+        int ts = (int)(ZonedDateTime.now(Clock.systemUTC()).toInstant().getEpochSecond() - EPOCH_SECONDS);
+        return join(ts, generateEntropy());
     }
 
-    private byte[] toArray(int ts, byte[] entropy) {
+    private byte[] generateEntropy() {
+        byte[] entropy = new byte[entropyLength];
+        random.nextBytes(entropy);
+        return entropy;
+    }
+
+    private byte[] join(int ts, byte[] entropy) {
         return ByteConverter.join(ByteConverter.encodeInt(ts), entropy);
     }
 
@@ -83,8 +94,8 @@ public class Ksuid {
         return ByteConverter.decodeInt(data);
     }
 
-    public LocalDateTime getTime() {
-        return LocalDateTime.ofEpochSecond(getRawKsuidEpoch() + (long) EPOCH_SECONDS, 0, ZoneOffset.UTC);
+    public ZonedDateTime getTime() {
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(getRawKsuidEpoch() + (long) EPOCH_SECONDS), ZoneOffset.UTC);
     }
 
     public byte[] getEntropy() {

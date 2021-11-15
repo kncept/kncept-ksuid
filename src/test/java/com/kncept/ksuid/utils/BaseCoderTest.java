@@ -3,11 +3,14 @@ package com.kncept.ksuid.utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.Charset;
+
 import static com.kncept.ksuid.utils.BaseCoder.alphabet_base16;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BaseCoderTest {
+    Charset utf8 = Charset.forName("UTF8");
 
     @Test
     public void alphabetLengths() {
@@ -54,10 +57,10 @@ public class BaseCoderTest {
     // examples from https://github.com/seruco/base62
     public void base62Compatability() {
         BaseCoder baseCoder = BaseCoder.base62Encoder;
-        String encoded = baseCoder.encode("Hello World".getBytes());
+        String encoded = baseCoder.encode("Hello World".getBytes(utf8));
         Assertions.assertEquals("73XpUgyMwkGr29M", encoded);
         byte decoded[] = baseCoder.decode("73XpUgyMwkGr29M");
-        Assertions.assertEquals("Hello World", new String(decoded));
+        Assertions.assertEquals("Hello World", new String(decoded, utf8));
     }
 
     @Test
@@ -102,24 +105,24 @@ public class BaseCoderTest {
     public void b64PrefixPadding() {
         // examples taken from https://en.wikipedia.org/wiki/Base64
         BaseCoder baseCoder = BaseCoder.base64EncoderWithPadding;
-        assertEquals("TWFu", baseCoder.encode("Man".getBytes()));
-        assertEquals("Man", new String(baseCoder.decode("TWFu")));
-        assertEquals("TWE=", baseCoder.encode("Ma".getBytes()));
-        assertEquals("Ma", new String(baseCoder.decode("TWE=")));
-        assertEquals("TQ==", baseCoder.encode("M".getBytes()));
-        assertEquals("M", new String(baseCoder.decode("TQ==")));
+        assertEquals("TWFu", baseCoder.encode("Man".getBytes(utf8)));
+        assertEquals("Man", new String(baseCoder.decode("TWFu"), utf8));
+        assertEquals("TWE=", baseCoder.encode("Ma".getBytes(utf8)));
+        assertEquals("Ma", new String(baseCoder.decode("TWE="), utf8));
+        assertEquals("TQ==", baseCoder.encode("M".getBytes(utf8)));
+        assertEquals("M", new String(baseCoder.decode("TQ=="), utf8));
     }
 
     @Test
     public void b64PrefixNoPadding() {
         // examples taken from https://en.wikipedia.org/wiki/Base64
         BaseCoder baseCoder = BaseCoder.base64Encoder;
-        assertEquals("TWFu", baseCoder.encode("Man".getBytes()));
-        assertEquals("Man", new String(baseCoder.decode("TWFu")));
-        assertEquals("TWE", baseCoder.encode("Ma".getBytes()));
-        assertEquals("Ma", new String(baseCoder.decode("TWE")));
-        assertEquals("TQ", baseCoder.encode("M".getBytes()));
-        assertEquals("M", new String(baseCoder.decode("TQ")));
+        assertEquals("TWFu", baseCoder.encode("Man".getBytes(utf8)));
+        assertEquals("Man", new String(baseCoder.decode("TWFu"), utf8));
+        assertEquals("TWE", baseCoder.encode("Ma".getBytes(utf8)));
+        assertEquals("Ma", new String(baseCoder.decode("TWE"), utf8));
+        assertEquals("TQ", baseCoder.encode("M".getBytes(utf8)));
+        assertEquals("M", new String(baseCoder.decode("TQ"), utf8));
     }
 
     @Test
@@ -128,20 +131,20 @@ public class BaseCoderTest {
         // examples taken from https://en.wikipedia.org/wiki/Base64
         assertEquals(
                 "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu",
-                baseCoder.encode("Many hands make light work.".getBytes())
+                baseCoder.encode("Many hands make light work.".getBytes(utf8))
         );
         assertArrayEquals(
-                "Many hands make light work.".getBytes(),
+                "Many hands make light work.".getBytes(utf8),
                 baseCoder.decode("TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu")
         );
 
         baseCoder = BaseCoder.base64EncoderWithPadding;
         assertEquals(
                 "aHR0cHM6Ly93d3cuYmV0dGVyLWNvbnZlcnRlci5jb20vQmFzZTY0LUVuY29kZQ==",
-                baseCoder.encode("https://www.better-converter.com/Base64-Encode".getBytes())
+                baseCoder.encode("https://www.better-converter.com/Base64-Encode".getBytes(utf8))
         );
         assertArrayEquals(
-                "https://www.better-converter.com/Base64-Encode".getBytes(),
+                "https://www.better-converter.com/Base64-Encode".getBytes(utf8),
                 baseCoder.decode("aHR0cHM6Ly93d3cuYmV0dGVyLWNvbnZlcnRlci5jb20vQmFzZTY0LUVuY29kZQ==")
         );
     }
@@ -151,18 +154,18 @@ public class BaseCoderTest {
         BaseCoder baseCoder = BaseCoder.base62Encoder;
 
         // https://github.com/seruco/base62
-        assertEquals("73XpUgyMwkGr29M", baseCoder.encode("Hello World".getBytes()));
-        assertEquals("Hello World", new String(baseCoder.decode("73XpUgyMwkGr29M")));
+        assertEquals("73XpUgyMwkGr29M", baseCoder.encode("Hello World".getBytes(utf8)));
+        assertEquals("Hello World", new String(baseCoder.decode("73XpUgyMwkGr29M"), utf8));
 
-        assertEquals("UMNTpGxZW0IadmWS", baseCoder.encode("Kncept Ksuid".getBytes()));
-        assertEquals("Kncept Ksuid", new String(baseCoder.decode("UMNTpGxZW0IadmWS")));
+        assertEquals("UMNTpGxZW0IadmWS", baseCoder.encode("Kncept Ksuid".getBytes(utf8)));
+        assertEquals("Kncept Ksuid", new String(baseCoder.decode("UMNTpGxZW0IadmWS"), utf8));
         assertEquals(
                 "OFdrUKABqhgqpDiiXQjFqvi8BIv5DEPYoIzgRilzpmpD9X3quWRhcT51jHhcvcrFG1GohGXDM32Q1lwvhxQcGj",
-                baseCoder.encode("https://www.better-converter.com/Encoders-Decoders/Base62-Encode".getBytes())
+                baseCoder.encode("https://www.better-converter.com/Encoders-Decoders/Base62-Encode".getBytes(utf8))
         );
         assertEquals(
                 "https://www.better-converter.com/Encoders-Decoders/Base62-Encode",
-                new String(baseCoder.decode("OFdrUKABqhgqpDiiXQjFqvi8BIv5DEPYoIzgRilzpmpD9X3quWRhcT51jHhcvcrFG1GohGXDM32Q1lwvhxQcGj"))
+                new String(baseCoder.decode("OFdrUKABqhgqpDiiXQjFqvi8BIv5DEPYoIzgRilzpmpD9X3quWRhcT51jHhcvcrFG1GohGXDM32Q1lwvhxQcGj"), utf8)
         );
     }
 
@@ -170,16 +173,16 @@ public class BaseCoderTest {
     public void base16Compatability() {
         BaseCoder baseCoder = BaseCoder.base16Encoder;
 
-        assertEquals("48656c6c6f20576f726c64".toUpperCase(), baseCoder.encode("Hello World".getBytes()));
-        assertEquals("Hello World", new String(baseCoder.decode("48656c6c6f20576f726c64".toUpperCase())));
+        assertEquals("48656c6c6f20576f726c64".toUpperCase(), baseCoder.encode("Hello World".getBytes(utf8)));
+        assertEquals("Hello World", new String(baseCoder.decode("48656c6c6f20576f726c64".toUpperCase()), utf8));
 
         assertEquals(
                 "68747470733a2f2f7777772e6265747465722d636f6e7665727465722e636f6d2f456e636f646572732d4465636f646572732f41736369692d546f2d4865782d456e636f646572".toUpperCase(),
-                baseCoder.encode("https://www.better-converter.com/Encoders-Decoders/Ascii-To-Hex-Encoder".getBytes())
+                baseCoder.encode("https://www.better-converter.com/Encoders-Decoders/Ascii-To-Hex-Encoder".getBytes(utf8))
         );
         assertEquals(
                 "https://www.better-converter.com/Encoders-Decoders/Ascii-To-Hex-Encoder",
-                new String(baseCoder.decode("68747470733a2f2f7777772e6265747465722d636f6e7665727465722e636f6d2f456e636f646572732d4465636f646572732f41736369692d546f2d4865782d456e636f646572".toUpperCase()))
+                new String(baseCoder.decode("68747470733a2f2f7777772e6265747465722d636f6e7665727465722e636f6d2f456e636f646572732d4465636f646572732f41736369692d546f2d4865782d456e636f646572".toUpperCase()), utf8)
         );
     }
 

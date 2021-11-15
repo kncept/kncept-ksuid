@@ -5,6 +5,7 @@ plugins {
     id 'com.kncept.junit.reporter' version '2.0.1'
 	id "com.github.spotbugs" version '4.6.0'
 	id 'maven-publish'
+	id 'signing'
 }
 
 apply plugin: 'java'
@@ -20,8 +21,9 @@ defaultTasks 'build', 'check'
 
 def junit5version = '5.5.1'
 
+test.finalizedBy 'junitHtmlReport'
 junitHtmlReport {
-	failOnEmpty = false
+	testReportsDir = "reports/junitreporter"
 }
 
 repositories {
@@ -71,7 +73,6 @@ jar {
 	}
 }
 
-/*
 spotbugsMain {
 	reports {
 		html {
@@ -90,6 +91,8 @@ spotbugsTest {
 		}
 	}
 }
+/*
+
 checkstyle {
 	ignoreFailures = false
 }
