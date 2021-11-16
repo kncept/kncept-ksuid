@@ -21,7 +21,7 @@ apply plugin: 'java'
 //apply plugin: 'pmd'
 
 group = 'com.kncept.ksuid'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.1'
 sourceCompatibility = 14
 targetCompatibility = 14
 
