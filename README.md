@@ -11,9 +11,9 @@ The string is URL safe, and will be naturally sorted my date order.
 
 # Using
 
-This project is release on Maven Central.
+This project is released on Maven Central.
 You are welcome to clone and build, but please open PR's if there are bugs.
-    `implementation com.kncept.ksuid:ksuid:1.0.0`
+    `implementation 'com.kncept.ksuid:ksuid:1.0.1'`
     
 Just import the main class and off you go.
 You may need to write a little encoder/decoder function for a custom type if you wish to use this some sort of ORM, but 

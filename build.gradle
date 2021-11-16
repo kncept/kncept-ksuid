@@ -3,7 +3,7 @@ import java.time.LocalDate
 
 // to publish:
 // update project version to the appropriate release
-// populate gradle.properties
+// populate gradle.properties and secring.gpg
 // gradlew publish
 // approve at https://oss.sonatype.org
 // goto 'Staging Repositories'
@@ -21,7 +21,7 @@ apply plugin: 'java'
 //apply plugin: 'pmd'
 
 group = 'com.kncept.ksuid'
-version = '1.0.1'
+version = '1.0.2-SNAPSHOT'
 sourceCompatibility = 14
 targetCompatibility = 14
 
