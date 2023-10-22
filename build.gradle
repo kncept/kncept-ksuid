@@ -10,24 +10,31 @@ import java.time.LocalDate
 // 'close', then 'release' the library
 
 plugins {
-    id 'com.kncept.junit.reporter' version '2.0.1'
-	id "com.github.spotbugs" version '4.6.0'
+    id 'com.kncept.junit.reporter' version '2.1.0'
 	id 'maven-publish'
 	id 'signing'
 }
 
 apply plugin: 'java'
-//apply plugin: 'checkstyle'
-//apply plugin: 'pmd'
 
 group = 'com.kncept.ksuid'
-version = '1.0.2-SNAPSHOT'
+version = calcversion()
+def String calcversion() {
+	String vers = "0.0.0-SNAPSHOT"
+	String grn = System.getenv("GITHUB_REF_NAME")
+	if (grn != null && !grn.trim().equals("")) {
+		if (grn.startsWith("v")) {
+			vers = grn.substring(1);
+		}
+	}
+	return vers
+}
 sourceCompatibility = 14
 targetCompatibility = 14
 
 defaultTasks 'build', 'check'
 
-def junit5version = '5.8.1'
+def junit5version = '5.10.0'
 
 test.finalizedBy 'junitHtmlReport'
 junitHtmlReport {
@@ -35,7 +42,7 @@ junitHtmlReport {
 }
 
 repositories {
-//	mavenLocal() // ./m2/repositories
+	mavenLocal() // ./m2/repositories
 //	maven { url 'https://repo.spring.io/libs-release'}
 	mavenCentral()
 }
@@ -79,63 +86,6 @@ jar {
 	}
 }
 
-spotbugsMain {
-	reports {
-		html {
-			enabled = true
-			destination = file("$buildDir/reports/spotbugs/main/spotbugs.html")
-			stylesheet = 'fancy-hist.xsl'
-		}
-	}
-}
-spotbugsTest {
-	reports {
-		html {
-			enabled = true
-			destination = file("$buildDir/reports/spotbugs/test/spotbugs.html")
-			stylesheet = 'fancy-hist.xsl'
-		}
-	}
-}
-/*
-
-checkstyle {
-	ignoreFailures = false
-}
-
-pmd {
-	ruleSets = [
-        //'java-android',
-        'java-basic',
-        'java-braces',
-        'java-clone',
-        'java-codesize',
-        'java-comments',
-        'java-controversial',
-        'java-coupling',
-        'java-design',
-        'java-empty',
-        'java-finalizers',
-        'java-imports',
-        'java-j2ee',
-        'java-javabeans',
-        'java-junit',
-        'java-logging-jakarta-commons',
-        'java-logging-java',
-        'java-migrating',
-        'java-naming',
-        'java-optimizations',
-        'java-strictexception',
-        'java-strings',
-        'java-sunsecure',
-        'java-typeresolution',
-        'java-unnecessary',
-        'java-unusedcode'
-	]
-	ignoreFailures = true
-}
-*/
-
 // use JUnit5 Platform for testing
 test {
     useJUnitPlatform()
@@ -145,8 +95,8 @@ test {
 // https://docs.gradle.org/current/userguide/gradle_wrapper.html#customizing_wrapper
 // Download will be from this kind of URL: https://services.gradle.org/distributions/gradle-6.8.2-bin.zip
 wrapper {
-	distributionType = Wrapper.DistributionType.ALL
-	gradleVersion = "7.3"
+	distributionType = Wrapper.DistributionType.BIN
+	gradleVersion = "8.4"
 }
 
 dependencies {
@@ -194,7 +144,7 @@ publishing {
 				]
 				licenses {
 					license {
-						name = 'MIT License'
+						name = 'unlicense'
 						url = 'https://github.com/kncept/kncept-ksuid/blob/main/LICENSE'
 					}
 				}
